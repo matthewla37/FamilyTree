@@ -1,10 +1,19 @@
 {
+
   "functions": {
-    "api/admin/*.php": {
+
+    "*.php": {
+
       "runtime": "vercel-php@0.7.3"
+
     },
-    "api/auth/*.php": {
+
+    "api/**/*.php": {
+
       "runtime": "vercel-php@0.7.3"
+
     }
+
   }
+
 }
