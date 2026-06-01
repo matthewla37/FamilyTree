@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FamilyTree.com – Find Ancestors. Build Your Tree.</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sage: #5a7a5c;
+    --sage-light: #7da87f;
+    --sage-dark: #3d5c3f;
+    --cream: #faf7f2;
+    --warm-white: #fff9f2;
+    --bark: #7a5c3a;
+    --ink: #2a2218;
+    --muted: #7a7060;
+    --border: #e2dbd0;
+    --accent: #c9a84c;
+    --teal: #2e7d7a;
+    --link: #3d6e8c;
+  }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--ink);
+    color: #ccc;
+    text-align: right;
+    padding: 5px 20px;
+    font-size: 12px;
+  }
+  .topbar a { color: var(--accent); text-decoration: none; }
+  .topbar a:hover { text-decoration: underline; }
+
+  /* HEADER */
+  header {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .logo-tree {
+    width: 52px;
+    height: 52px;
+  }
+
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--sage-dark);
+    line-height: 1;
+  }
+  .logo-text span { color: var(--ink); font-weight: 400; }
+  .logo-text sup { font-size: 10px; color: var(--muted); vertical-align: super; }
+
+  nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  nav a {
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 3px;
+    transition: background .2s, color .2s;
+  }
+  nav a:hover { background: var(--sage); color: #fff; }
+
+  .dna-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #1a3a5c, #2e7d7a);
+    border-radius: 20px;
+    padding: 5px 12px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .dna-helix { font-size: 16px; }
+
+  /* HERO SECTION */
+  .hero {
+    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--teal) 100%);
+    padding: 30px;
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .hero-image {
+    flex: 1 1 380px;
+    min-height: 200px;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(180deg, #8ec5c7 0%, #e8c87a 60%, #c97a3a 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 20px;
+  }
+
+  /* SVG silhouette of family on beach */
+  .hero-image svg { width: 80%; max-width: 340px; }
+
+  .hero-search {
+    flex: 0 0 240px;
+    background: var(--warm-white);
+    border-radius: 6px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.18);
+  }
+  .hero-search h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--sage-dark);
+    line-height: 1.2;
+  }
+  .hero-search p { font-size: 12px; color: var(--muted); margin-top: -6px; }
+  .hero-search label { font-size: 12px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 3px; }
+  .hero-search input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: 'Lato', sans-serif;
+    background: #fff;
+    color: var(--ink);
+    transition: border-color .2s;
+  }
+  .hero-search input:focus { outline: none; border-color: var(--sage); }
+  .btn-search {
+    background: var(--sage);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 9px 22px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background .2s;
+  }
+  .btn-search:hover { background: var(--sage-dark); }
+
+  /* MAIN LAYOUT */
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 30px;
+    padding: 28px 0 40px;
+    align-items: start;
+  }
+
+  /* INTRO */
+  .intro-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .section-header h3 {
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .section-header span {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .section-rule { flex: 1; height: 1px; background: var(--border); }
+
+  /* INFO CARDS */
+  .info-cards { display: flex; flex-direction: column; gap: 22px; }
+
+  .info-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-card:last-of-type { border-bottom: none; }
+
+  .info-card-img {
+    width: 90px;
+    height: 68px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    object-fit: cover;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .img-dna { background: linear-gradient(135deg, #1a3a5c, #2e7d7a); }
+  .img-genealogy { background: linear-gradient(135deg, #3a5c8a, #5a8ac9); }
+  .img-surnames { background: linear-gradient(135deg, #5c7a3a, #9abc5a); }
+  .img-cultural { background: linear-gradient(135deg, #8a5c2a, #c9843a); }
+  .img-local { background: linear-gradient(135deg, #5a5a5a, #8a8a7a); }
+  .img-101 { background: linear-gradient(135deg, #8a2a2a, #c93a3a); }
+  .img-dict { background: linear-gradient(135deg, #4a3a2a, #8a6a4a); }
+
+  .info-card-body h4 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+  .info-card-body p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+  .read-more {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--link);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .read-more:hover { text-decoration: underline; }
+
+  /* DROPDOWN */
+  .card-select {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: 'Lato', sans-serif;
+    color: var(--ink);
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7060'/%3E%3C/svg%3E") no-repeat right 10px center;
+    appearance: none;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  /* TAG CLOUD */
+  .tag-cloud-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .tag-cloud-section .section-header { margin-bottom: 14px; }
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    color: var(--link);
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 1.4;
+    transition: color .2s;
+  }
+  .tag:hover { color: var(--sage-dark); text-decoration: underline; }
+  .tag.large { font-size: 20px; font-weight: 700; }
+  .tag.medium-large { font-size: 16px; font-weight: 700; }
+  .tag.medium { font-size: 14px; font-weight: 600; }
+  .tag.small { font-size: 12px; }
+  .tag.tiny { font-size: 11px; color: var(--muted); }
+
+  /* SIDEBAR */
+  .sidebar { display: flex; flex-direction: column; gap: 22px; }
+
+  .sidebar-pinterest {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    text-align: center;
+  }
+  .pinterest-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    color: #e60023;
+    font-style: italic;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .pinterest-logo::before { content: '𝓟'; font-size: 42px; }
+
+  .sidebar-search {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .sidebar-search h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: var(--sage-dark);
+    margin-bottom: 3px;
+  }
+  .sidebar-search p { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  .sidebar-search label { font-size: 11px; font-weight: 700; display: block; margin-bottom: 3px; }
+  .sidebar-search input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 8px;
+    font-size: 12px;
+    margin-bottom: 8px;
+    font-family: 'Lato', sans-serif;
+  }
+  .sidebar-search input:focus { outline: none; border-color: var(--sage); }
+
+  /* BLOG SEARCH */
+  .sidebar-blog-search {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .sidebar-blog-search h4 {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .blog-search-row { display: flex; gap: 6px; }
+  .blog-search-row input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-family: 'Lato', sans-serif;
+  }
+  .btn-sm {
+    background: var(--sage);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-sm:hover { background: var(--sage-dark); }
+
+  /* BLOG ACTIVITY */
+  .sidebar-blog {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .sidebar-blog h4 {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .blog-item { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .blog-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .blog-item a {
+    font-family: 'Source Serif 4', serif;
+    font-size: 12.5px;
+    color: var(--link);
+    text-decoration: none;
+    line-height: 1.4;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .blog-item a:hover { text-decoration: underline; }
+  .blog-date { font-size: 10.5px; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: #aaa;
+    padding: 18px 30px;
+    text-align: center;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-top: 3px solid var(--sage);
+  }
+  footer a { color: #aaa; text-decoration: none; }
+  footer a:hover { color: #fff; text-decoration: underline; }
+  footer .sep { color: #555; }
+
+  /* TREE SVG */
+  .tree-svg { width: 52px; height: 52px; }
+
+  @media (max-width: 700px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .hero { flex-direction: column; }
+    .hero-image { min-height: 160px; }
+    header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="#">Check Out Our Latest Blogs »</a>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">
+    <!-- Tree SVG logo -->
+    <svg class="tree-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="26" cy="20" r="14" fill="#7da87f" opacity=".85"/>
+      <circle cx="18" cy="26" r="10" fill="#5a7a5c" opacity=".75"/>
+      <circle cx="34" cy="26" r="10" fill="#5a7a5c" opacity=".75"/>
+      <circle cx="26" cy="14" r="8" fill="#9abf9c" opacity=".7"/>
+      <rect x="24" y="32" width="4" height="14" rx="2" fill="#7a5c3a"/>
+      <rect x="16" y="42" width="20" height="2" rx="1" fill="#c9a84c" opacity=".5"/>
+    </svg>
+    <div>
+      <div class="logo-text">familytree<span>.com</span><sup>®</sup></div>
+    </div>
+  </a>
+
+  <nav>
+    <a href="#">Reviews</a>
+    <a href="#">Research</a>
+    <a href="#">Culture</a>
+    <a href="#">Heritage</a>
+    <a href="#">Surnames</a>
+    <a href="#">Learn</a>
+    <div class="dna-badge">
+      <span class="dna-helix">🧬</span>
+      <span>DNA</span>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <!-- Illustrated hero image -->
+  <div class="hero-image">
+    <svg viewBox="0 0 340 180" xmlns="http://www.w3.org/2000/svg">
+      <!-- Sky gradient done in CSS background -->
+      <!-- Horizon line -->
+      <rect x="0" y="120" width="340" height="60" fill="#c97a3a" opacity=".4"/>
+      <!-- Water reflections -->
+      <ellipse cx="170" cy="150" rx="120" ry="12" fill="#e8a050" opacity=".3"/>
+      <!-- Sun -->
+      <circle cx="280" cy="60" r="28" fill="#f0c050" opacity=".8"/>
+      <circle cx="280" cy="60" r="22" fill="#f4d070" opacity=".9"/>
+      <!-- Adult silhouette left -->
+      <ellipse cx="100" cy="88" rx="10" ry="10" fill="#1a1008"/>
+      <rect x="94" y="97" width="12" height="28" rx="6" fill="#1a1008"/>
+      <!-- Adult silhouette right -->
+      <ellipse cx="148" cy="88" rx="10" ry="10" fill="#1a1008"/>
+      <rect x="142" y="97" width="12" height="28" rx="6" fill="#1a1008"/>
+      <!-- Child silhouette center -->
+      <ellipse cx="124" cy="100" rx="7" ry="7" fill="#1a1008"/>
+      <rect x="119" y="106" width="10" height="18" rx="5" fill="#1a1008"/>
+      <!-- Arms connecting family -->
+      <line x1="106" y1="108" x2="119" y2="108" stroke="#1a1008" stroke-width="4" stroke-linecap="round"/>
+      <line x1="129" y1="108" x2="142" y2="108" stroke="#1a1008" stroke-width="4" stroke-linecap="round"/>
+      <!-- Ground -->
+      <rect x="0" y="125" width="340" height="8" fill="#8a6a3a" opacity=".3"/>
+    </svg>
+  </div>
+
+  <!-- Search widget -->
+  <div class="hero-search">
+    <h2>Family Tree Search</h2>
+    <p>Find Ancestors. Build Your Tree.</p>
+    <div>
+      <label for="fname">First Name</label>
+      <input type="text" id="fname" placeholder="">
+    </div>
+    <div>
+      <label for="lname">Last Name</label>
+      <input type="text" id="lname" placeholder="">
+    </div>
+    <button class="btn-search">Search</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+  <div class="main-grid">
+
+    <!-- LEFT COLUMN -->
+    <main>
+      <p class="intro-text">
+        FamilyTree.com is a genealogy, ancestry, and family tree research website. We offer reviews, articles, surname research, and genealogy advice. Genealogy tips for the beginner to the advanced researcher. Find site reviews, technology tips, DIY family tree ideas, information on cultural and local heritage, and an active social community. Our blogs are rich in research tips on primary and secondary sources, the latest in technology, and the latest trends in genealogy. Sign up for our monthly emails and join our FamilyTree family on Facebook, Twitter, Google+, and Pinterest. Find Ancestors. Build Your Tree.
+      </p>
+
+      <!-- Section heading -->
+      <div class="section-header">
+        <h3>Information</h3>
+        <span>Resources</span>
+        <div class="section-rule"></div>
+      </div>
+
+      <!-- Cards -->
+      <div class="info-cards">
+
+        <div class="info-card">
+          <div class="info-card-img img-dna">🧬</div>
+          <div class="info-card-body">
+            <h4>DNA Site Reviews</h4>
+            <p>Reviews of top DNA sites. Dive into your ancestry through your DNA. Explore the latest boom in Genealogy and Family History research.</p>
+            <a class="read-more" href="#">read more »</a>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-img img-genealogy">🔍</div>
+          <div class="info-card-body">
+            <h4>Genealogy Site Reviews</h4>
+            <p>Reviews of top genealogy and family tree sites. These in-depth reviews provide feature comparisons and are a must before signing up for a paid service.</p>
+            <a class="read-more" href="#">read more »</a>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-img img-surnames">🌱</div>
+          <div class="info-card-body">
+            <h4>Surnames Database</h4>
+            <p>Find the meaning of your family name. We've compiled a database of hundreds of names with great information about each one. <a class="read-more" href="#">read more »</a></p>
+            <select class="card-select">
+              <option>Select Surname(s)</option>
+              <option>Smith</option>
+              <option>Johnson</option>
+              <option>Williams</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-img img-cultural">🏺</div>
+          <div class="info-card-body">
+            <h4>Cultural Heritage</h4>
+            <p>You can learn a lot about yourself and your family by digging deeper into your own cultural heritage. Learn more about your family's heritage. <a class="read-more" href="#">read more »</a></p>
+            <select class="card-select">
+              <option>Select a Culture</option>
+              <option>Irish</option>
+              <option>Italian</option>
+              <option>German</option>
+              <option>Polish</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-img img-local">🏚️</div>
+          <div class="info-card-body">
+            <h4>Local Heritage</h4>
+            <p>Many states and provinces have archives specifically dedicated to the family history of their local area. Research the area you are from. <a class="read-more" href="#">read more »</a></p>
+            <select class="card-select">
+              <option>Select a State</option>
+              <option>Alabama</option>
+              <option>Alaska</option>
+              <option>Arizona</option>
+              <option>Wisconsin</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-img img-101">📚</div>
+          <div class="info-card-body">
+            <h4>Genealogy 101</h4>
+            <p>Genealogy has had a surge of popularity over the last 30 years. However, it has continuously been of interest and importance to people for hundreds of years.</p>
+            <a class="read-more" href="#">read more »</a>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-img img-dict">📜</div>
+          <div class="info-card-body">
+            <h4>Genealogy Dictionary</h4>
+            <p>In this section we provide the definitions of the most commonly used expressions in the field of Genealogy. If you're just getting started in your genealogy research, you may find this helpful. <a class="read-more" href="#">read more »</a></p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tag Cloud -->
+      <div class="tag-cloud-section">
+        <div class="section-header">
+          <h3>Tag</h3>
+          <span>Cloud</span>
+          <div class="section-rule"></div>
+        </div>
+        <div class="tag-cloud">
+          <a class="tag medium" href="#">19th century</a>
+          <a class="tag tiny" href="#">20th century</a>
+          <a class="tag small" href="#">23andMe</a>
+          <a class="tag medium" href="#">America</a>
+          <a class="tag small" href="#">ancestor</a>
+          <a class="tag large" href="#">ancestors</a>
+          <a class="tag medium-large" href="#">ancestry</a>
+          <a class="tag tiny" href="#">Ancestry.com</a>
+          <a class="tag small" href="#">census</a>
+          <a class="tag small" href="#">Civil War</a>
+          <a class="tag medium" href="#">databases</a>
+          <a class="tag small" href="#">DNA</a>
+          <a class="tag tiny" href="#">documents</a>
+          <a class="tag small" href="#">England</a>
+          <a class="tag medium" href="#">family</a>
+          <a class="tag medium-large" href="#">Family Heritage</a>
+          <a class="tag large" href="#">Family History</a>
+          <a class="tag tiny" href="#">family research</a>
+          <a class="tag medium" href="#">FamilySearch</a>
+          <a class="tag large" href="#">family tree</a>
+          <a class="tag medium-large" href="#">familytree.com</a>
+          <a class="tag small" href="#">family tree research</a>
+          <a class="tag large" href="#">Genealogy</a>
+          <a class="tag tiny" href="#">genetics</a>
+          <a class="tag medium-large" href="#">Heritage</a>
+          <a class="tag small" href="#">history</a>
+          <a class="tag small" href="#">hometown</a>
+          <a class="tag tiny" href="#">images</a>
+          <a class="tag small" href="#">immigrants</a>
+          <a class="tag small" href="#">military</a>
+          <a class="tag medium" href="#">myheritage</a>
+          <a class="tag small" href="#">newspapers</a>
+          <a class="tag medium-large" href="#">photos</a>
+          <a class="tag small" href="#">Preservation</a>
+          <a class="tag medium" href="#">records</a>
+          <a class="tag small" href="#">relatives</a>
+          <a class="tag small" href="#">research</a>
+          <a class="tag tiny" href="#">Scrapbooking</a>
+          <a class="tag tiny" href="#">soldiers</a>
+          <a class="tag tiny" href="#">surnames</a>
+          <a class="tag small" href="#">U.S. history</a>
+          <a class="tag small" href="#">United Kingdom</a>
+          <a class="tag medium" href="#">United States</a>
+          <a class="tag small" href="#">vital records</a>
+        </div>
+      </div>
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- Pinterest -->
+      <div class="sidebar-pinterest">
+        <div style="font-family:'Playfair Display',serif; font-size:52px; color:#e60023; line-height:1; font-style:italic;">Pinterest</div>
+      </div>
+
+      <!-- Search widget -->
+      <div class="sidebar-search">
+        <h4>Family Tree Search</h4>
+        <p>Find Ancestors. Build Your Tree.</p>
+        <label>First Name</label>
+        <input type="text">
+        <label>Last Name</label>
+        <input type="text">
+        <button class="btn-search" style="width:100%;">Search</button>
+      </div>
+
+      <!-- Blog search -->
+      <div class="sidebar-blog-search">
+        <h4>Search Blog</h4>
+        <div class="blog-search-row">
+          <input type="text" placeholder="Search this site">
+          <button class="btn-sm">Go</button>
+        </div>
+      </div>
+
+      <!-- Blog Activity -->
+      <div class="sidebar-blog">
+        <h4>Blog Activity</h4>
+
+        <div class="blog-item">
+          <a href="#">Browse Burials From Across England And Wales</a>
+          <div class="blog-date">May 8, 2026</div>
+        </div>
+        <div class="blog-item">
+          <a href="#">Introducing Family Infographics – Turn A Loved One's Live Story Into A Beautiful Work of Art</a>
+          <div class="blog-date">May 8, 2026</div>
+        </div>
+        <div class="blog-item">
+          <a href="#">DNA Analysis Of Neanderthal Teeth Reveals A Much Closer Genetic Connection Than Previously Known</a>
+          <div class="blog-date">May 8, 2026</div>
+        </div>
+        <div class="blog-item">
+          <a href="#">MyHeritage Adds 148 Million Historical Records In April 2026</a>
+          <div class="blog-date">May 8, 2026</div>
+        </div>
+        <div class="blog-item">
+          <a href="#">CNN Original Series "This Land" Premieres Sunday June 7 and 9 ET/PT</a>
+          <div class="blog-date">May 8, 2026</div>
+        </div>
+        <div class="blog-item">
+          <a href="#">Uncover New Stories with over 800,000 New Records This Week</a>
+          <div class="blog-date">May 8, 2026</div>
+        </div>
+        <div class="blog-item">
+          <a href="#">Some Simple Mother's Day Activities Remind Us Of Those Who We Live And Help Cherish the Idea of Motherhood</a>
+          <div class="blog-date">May 8, 2026</div>
+        </div>
+        <div class="blog-item">
+          <a href="#">Weight and Metabolism May Depend More on DNA Than Your Dinner Plate</a>
+          <div class="blog-date">Apr 29, 2026</div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#">Privacy</a>
+  <span class="sep">|</span>
+  <a href="#">Terms</a>
+  <span class="sep">|</span>
+  <a href="#">About Us</a>
+  <span class="sep">|</span>
+  <a href="#">Do not share or sell my information</a>
+</footer>
+
+</body>
+</html>

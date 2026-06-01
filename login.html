@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamilyTree.com - Welcome Back</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 24px 16px;
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            background: url('background.png') center center / cover no-repeat;
+            z-index: 0;
+        }
+
+        .logo {
+            position: relative;
+            z-index: 10;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 38px 46px 32px;
+            width: 100%;
+            max-width: 490px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .card h1 {
+            text-align: center;
+            font-size: 26px;
+            color: #1a1f2e;
+            font-weight: 800;
+            margin-bottom: 14px;
+            letter-spacing: -0.3px;
+        }
+
+        .tree-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .tree-divider hr {
+            flex: 1;
+            border: none;
+            border-top: 1.5px solid #b8d0de;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 26px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 13px 16px 13px 46px;
+            border: 1.5px solid #dde6ec;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.18s;
+        }
+
+        .input-group input:focus {
+            border-color: #4a9b6f;
+            box-shadow: 0 0 0 3px rgba(74,155,111,0.1);
+        }
+
+        .input-group input::placeholder {
+            color: #aab6c2;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #4a8b2a;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.18s;
+            margin-bottom: 18px;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-login:hover { background: #3d7522; }
+        .btn-login:active { background: #326018; }
+
+        .signup-row {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .signup-row a {
+            color: #2b7ab5;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .signup-row a:hover { text-decoration: underline; }
+
+        /* ---- API response message ---- */
+        .msg {
+            display: none;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .msg.success { background: #eaf6ee; color: #2d6a40; border: 1px solid #a8dbb8; }
+        .msg.error   { background: #fdecea; color: #b02a20; border: 1px solid #f5b7b1; }
+        .msg ul { margin: 4px 0 0 18px; }
+
+        .btn-login:disabled { background: #8fbf72; cursor: not-allowed; }
+
+        footer {
+            position: relative;
+            z-index: 10;
+            margin-top: 22px;
+            color: rgba(255,255,255,0.82);
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg"></div>
+
+    <!-- Logo -->
+    <div class="logo">
+        <img src="logo.png" alt="FamilyTree.com" height="60">
+    </div>
+
+    <!-- Card -->
+    <div class="card">
+        <h1>Welcome Back!</h1>
+
+        <div class="tree-divider">
+            <hr>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="15" width="2" height="6" rx="1" fill="#90aabf"/>
+                <ellipse cx="11" cy="14" rx="6" ry="4.5" fill="#7ab8d0"/>
+                <ellipse cx="11" cy="9.5" rx="4.5" ry="4" fill="#8ac4dc"/>
+                <ellipse cx="11" cy="5.5" rx="3" ry="3" fill="#9ad0e8"/>
+            </svg>
+            <hr>
+        </div>
+
+        <!-- API feedback banner -->
+        <div id="msg" class="msg" role="alert"></div>
+
+        <p class="subtitle">Please log in to continue your family history journey.</p>
+
+        <!-- Phone Number -->
+        <div class="input-group">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="#4a9b6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.95-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <input type="tel" id="phone" placeholder="Phone Number" autocomplete="tel">
+        </div>
+
+        <button class="btn-login" id="loginBtn" type="button" onclick="handleLogin()">Send PIN</button>
+
+        <div class="input-group" id="pinGroup" style="display:none;">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="#4a9b6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="6" />
+                <path d="M12 8v4l2 2" />
+            </svg>
+            <input type="text" id="pin" placeholder="Enter PIN" autocomplete="one-time-code" maxlength="6">
+        </div>
+        <button class="btn-login" id="verifyBtn" type="button" onclick="handleVerifyPin()" style="display:none;">Verify PIN</button>
+
+        <div class="signup-row">
+            Don't have an account? <a href="signup.html">Sign Up</a>
+        </div>
+    </div>
+
+    <footer>© 2026 FamilyTree.com &nbsp;|&nbsp; All rights reserved.</footer>
+
+    <script>
+        // ── Show a banner message ───────────────────────────────────────
+        function showMsg(type, html) {
+            const el = document.getElementById('msg');
+            el.className = 'msg ' + type;
+            el.innerHTML = html;
+            el.style.display = 'block';
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ── Login handler ───────────────────────────────────────────────
+        let loginPhone = '';
+
+        async function handleLogin() {
+            const btn = document.getElementById('loginBtn');
+            
+            const phone = document.getElementById('phone').value.trim();
+            
+            if (!phone) {
+                showMsg('error', 'Please enter your phone number.');
+                return;
+            
+            }
+            btn.disabled = true;
+            btn.textContent = 'Authenticating…';
+
+            try {
+                console.log("hhh", JSON.stringify({ phone_number: phone })) ;
+                const res = await fetch('api/auth/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone_number: phone }),
+                });
+                
+                const json = await res.json();
+                if (json.success) {
+                    // Check if this is an immediate admin redirect
+                    if (json.redirect_url) {
+                        showMsg('success', json.message);
+                        setTimeout(() => window.location.href = json.redirect_url, 800);
+                    } else {
+                        // Regular user: show PIN input
+                        loginPhone = phone;
+                        document.getElementById('pinGroup').style.display = 'block';
+                        document.getElementById('verifyBtn').style.display = 'block';
+                        showMsg('success', json.message);
+                        btn.textContent = 'Resend PIN';
+                    }
+                } else {
+                    let html = `<strong>${json.message}</strong>`;
+                    const errs = Object.values(json.errors || {});
+                    if (errs.length) {
+                        html += '<ul>' + errs.map(e => `<li>${e}</li>`).join('') + '</ul>';
+                    }
+                    showMsg('error', html);
+                    btn.textContent = 'Send PIN';
+                }
+            } catch (err) {
+                showMsg('error', 'Network error — could not reach the server.');
+                btn.textContent = 'Send PIN';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function handleVerifyPin() {
+            const btn = document.getElementById('verifyBtn');
+            const pin = document.getElementById('pin').value.trim();
+            const phone = loginPhone || document.getElementById('phone').value.trim();
+
+            if (!pin) {
+                showMsg('error', 'Please enter the 6-digit PIN.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Verifying…';
+
+            try {
+                const res = await fetch('api/auth/verify_pin.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone_number: phone, pin }),
+                });
+
+                const json = await res.json();
+                if (json.success) {
+                    showMsg('success', json.message + ' Redirecting...');
+                    window.location.href = json.redirect_url;
+                } else {
+                    showMsg('error', json.message);
+                }
+            } catch (err) {
+                showMsg('error', 'Network error — could not reach the server.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Verify PIN';
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                if (document.getElementById('pinGroup').style.display === 'block') {
+                    handleVerifyPin();
+                } else {
+                    handleLogin();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

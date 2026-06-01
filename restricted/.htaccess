@@ -1,0 +1,4 @@
+Options -Indexes
+RewriteEngine On
+RewriteBase /restricted/
+RewriteRule ^.*$ index.php [L,QSA]
